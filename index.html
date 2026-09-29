@@ -4,6 +4,300 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>원태우 지사를 찾아서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Song+Myung&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 안양 개략 지도 한 장이 무대. 장소 6곳을 둘러보면 가운데 초상이 색을 되찾고, 금테가 열리면 그날의 이야기로 들어간다. */
+:root{
+  --bg:#E9ECE8; --paper:#F6F7F3; --ink:#1D2430; --muted:#5C6570; --line:#C6CCC5;
+  --river:#8DADBE; --hill:#D6DCD2; --rail:#39404A; --accent:#2E4A6E; --gold:#B5862A; --gold-soft:rgba(181,134,42,.18);
+  --scrim:rgba(20,24,30,.55);
+  --display:"Song Myung","Nanum Myeongjo","Batang",serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12161B; --paper:#1A1F26; --ink:#E5E8E3; --muted:#9BA3AB; --line:#333A43;
+  --river:#3D6376; --hill:#232A31; --rail:#B7BCC2; --accent:#93B3D8; --gold:#DDAE4E; --gold-soft:rgba(221,174,78,.2);
+  --scrim:rgba(0,0,0,.65); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161B; --paper:#1A1F26; --ink:#E5E8E3; --muted:#9BA3AB; --line:#333A43;
+  --river:#3D6376; --hill:#232A31; --rail:#B7BCC2; --accent:#93B3D8; --gold:#DDAE4E; --gold-soft:rgba(221,174,78,.2);
+  --scrim:rgba(0,0,0,.65); color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.7}
+.wrap{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:28px 40px;display:grid;gap:20px}
+header{display:grid;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--muted)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,6vw,46px);line-height:1.15;margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);max-width:60ch}
+.status{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
+.progress{display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums;font-size:14px}
+.pips{display:flex;gap:5px}
+.pip{width:22px;height:6px;border-radius:3px;background:var(--line);transition:background .4s}
+.pip.on{background:var(--gold)}
+.btn{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* 지도 */
+.map{position:relative;width:100%;aspect-ratio:1/1.02;max-height:86vh;margin-inline:auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.map svg.base{position:absolute;inset:0;width:100%;height:100%}
+.base text{font-family:var(--body);fill:var(--muted)}
+.marker{position:absolute;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:4px;background:none;border:0;padding:0;cursor:pointer;color:var(--ink);width:clamp(62px,15%,110px)}
+.thumb{position:relative;width:100%;aspect-ratio:1;border-radius:50%;background:var(--bg);border:2px solid var(--rail);display:grid;place-items:center;transition:transform .2s,border-color .3s,background .3s}
+.thumb svg{width:52%;height:52%;color:var(--muted)}
+.marker:hover .thumb{transform:scale(1.06)}
+.num{position:absolute;top:-4px;left:-4px;width:24px;height:24px;border-radius:50%;background:var(--paper);border:1.5px solid var(--rail);font-size:12px;font-weight:600;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.marker.seen .thumb{border-color:var(--gold);background:var(--gold-soft)}
+.marker.seen .thumb svg{color:var(--gold)}
+.marker.seen .num{background:var(--gold);border-color:var(--gold);color:var(--paper)}
+.mlabel{font-size:clamp(10.5px,1.8vw,13px);font-weight:500;line-height:1.3;text-align:center;background:var(--paper);padding:1px 6px;border-radius:4px;white-space:nowrap}
+
+/* 가운데 초상 */
+.portrait{position:absolute;left:55%;top:46%;transform:translate(-50%,-50%);width:clamp(110px,30%,230px);aspect-ratio:1;border-radius:50%;border:4px solid var(--line);padding:0;background:var(--paper);cursor:default;overflow:hidden;transition:border-color .8s,box-shadow .8s}
+@property --fill{syntax:'<angle>';inherits:true;initial-value:0deg}
+.portrait{--fill:0deg;transition:border-color .8s,box-shadow .8s,--fill .7s ease}
+.portrait .layer{position:absolute;inset:0}
+.portrait .layer svg{width:100%;height:100%;display:block}
+.portrait .gray svg{filter:grayscale(1) contrast(.8) brightness(1.05)}
+.portrait .color{-webkit-mask-image:conic-gradient(#000 0 var(--fill),transparent var(--fill) 360deg);mask-image:conic-gradient(#000 0 var(--fill),transparent var(--fill) 360deg)}
+.portrait .ticks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.portrait .ticks line{stroke:var(--paper);stroke-width:2.2;opacity:.85}
+.portrait.gold .ticks{opacity:0;transition:opacity .8s}
+.portrait.gold{border-color:var(--gold);cursor:pointer;box-shadow:0 0 0 6px var(--gold-soft);animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 12px var(--gold-soft)}}
+.plabel{position:absolute;left:55%;top:calc(46% + clamp(62px,16%,124px));transform:translateX(-50%);font-size:12px;color:var(--muted);text-align:center;white-space:nowrap;background:var(--paper);padding:1px 8px;border-radius:4px}
+.plabel.gold{color:var(--gold);font-weight:600}
+
+.note{font-size:12.5px;color:var(--muted);margin:0;max-width:70ch}
+
+/* 팝업 */
+.scrim{position:fixed;inset:0;background:var(--scrim);display:grid;place-items:center;padding:16px;z-index:10}
+.card{background:var(--paper);color:var(--ink);border-radius:8px;max-width:520px;width:100%;max-height:88vh;overflow:auto;padding:22px;display:grid;gap:12px;border:1px solid var(--line)}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.chip{display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--accent);border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-variant-numeric:tabular-nums}
+.card h2{font-family:var(--display);font-weight:400;font-size:26px;line-height:1.25;margin:6px 0 0;text-wrap:balance}
+.photo{aspect-ratio:16/9;border:1.5px dashed var(--line);border-radius:6px;display:grid;place-items:center;color:var(--muted);font-size:13px;background:var(--bg)}
+figure{margin:0;display:grid;gap:6px}
+figure img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;background:var(--bg)}
+figcaption{font-size:11.5px;color:var(--muted);line-height:1.5}
+figcaption a{color:inherit}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;filter:grayscale(.85);transition:filter .5s}
+.marker.seen .thumb img{filter:none}
+.credits{font-size:12px;color:var(--muted);margin:0;display:grid;gap:4px}
+.credits h2{font-size:13px;font-weight:600;margin:0;color:var(--ink)}
+.credits ul{margin:0;padding-left:18px}
+.credits a{color:inherit}
+.card p{margin:0}
+.where{font-size:13px;color:var(--muted)}
+.x{background:none;border:0;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:4px}
+
+/* 마지막 이야기 */
+.story{max-width:640px}
+.story h2{font-size:clamp(26px,5vw,34px)}
+.date{font-family:var(--display);font-size:18px;color:var(--gold)}
+.beat{display:grid;gap:6px;padding-top:12px;border-top:1px solid var(--line)}
+.beat h3{margin:0;font-size:13px;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.beat p{max-width:60ch}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">안양 인물 홍보 · 프로토타입</span>
+    <h1>원태우 지사를 찾아서</h1>
+    <p class="lede">지도 위 여섯 곳을 하나씩 눌러 보세요. 장소를 둘러볼 때마다 가운데 인물이 색을 되찾고, 모두 둘러보면 1905년 그날의 이야기가 열립니다.</p>
+  </header>
+
+  <div class="status">
+    <div class="progress"><div class="pips" id="pips"></div><span id="count">0 / 6</span></div>
+    <button class="btn" id="reset" type="button">처음부터</button>
+  </div>
+
+  <div class="map" id="map">
+    <svg class="base" viewBox="0 0 100 102" preserveAspectRatio="none" aria-hidden="true">
+      <!-- 산 -->
+      <path d="M30 0 Q45 9 60 3 Q72 -1 88 0 L88 0 Z" fill="var(--hill)"/>
+      <path d="M26 0 C40 13 62 12 92 0 L26 0Z" fill="var(--hill)"/>
+      <path d="M0 78 C8 74 12 86 8 102 L0 102Z" fill="var(--hill)"/>
+      <!-- 안양천 -->
+      <path d="M30 102 C28 86 34 74 30 62 C26 50 30 38 26 26 C23 16 26 8 22 0" fill="none" stroke="var(--river)" stroke-width="1.6" stroke-linecap="round"/>
+      <!-- 학의천 -->
+      <path d="M30 62 C44 60 56 56 70 58 C80 60 90 54 100 52" fill="none" stroke="var(--river)" stroke-width=".9" stroke-linecap="round"/>
+      <!-- 경부선 -->
+      <path d="M11 0 C13 14 17 22 16 34 C15 46 14 58 18 72 C20 82 20 92 22 102" fill="none" stroke="var(--rail)" stroke-width=".9"/>
+      <path d="M11 0 C13 14 17 22 16 34 C15 46 14 58 18 72 C20 82 20 92 22 102" fill="none" stroke="var(--paper)" stroke-width=".5" stroke-dasharray="1.6 1.6"/>
+      <text x="44" y="6.5" font-size="2.6">관악산</text>
+      <text x="1.5" y="96" font-size="2.4">수리산</text>
+      <text x="6" y="47" font-size="2" transform="rotate(-84 6 47)">경부선</text>
+      <text x="31.5" y="97" font-size="2">안양천</text>
+      <text x="2" y="66" font-size="3" font-weight="600" opacity=".55">만안구</text>
+      <text x="84" y="92" font-size="3" font-weight="600" opacity=".55">동안구</text>
+    </svg>
+
+    <button class="portrait" id="portrait" type="button" aria-label="원태우 지사 초상. 여섯 장소를 모두 둘러보면 한 칸씩 색이 찹니다" aria-disabled="true">
+      <span class="layer gray" id="grayLayer"><svg viewBox="0 0 200 200" id="face" aria-hidden="true">
+        <rect width="200" height="200" fill="#D9B77A"/>
+        <circle cx="100" cy="100" r="78" fill="#E8CF9C"/>
+        <!-- 두루마기(몸) -->
+        <path d="M34 200 C38 150 64 132 100 132 C136 132 162 150 166 200Z" fill="#F1EDE2"/>
+        <path d="M100 132 L82 200 M100 132 L118 200" stroke="#C9C0AC" stroke-width="3" fill="none"/>
+        <path d="M86 140 L100 160 L114 140" fill="none" stroke="#2F4A6E" stroke-width="5"/>
+        <!-- 목 -->
+        <rect x="88" y="112" width="24" height="24" rx="6" fill="#C9956A"/>
+        <!-- 얼굴 -->
+        <ellipse cx="100" cy="90" rx="30" ry="36" fill="#D8A57A"/>
+        <!-- 머리/상투 -->
+        <path d="M70 84 C68 58 84 48 100 48 C116 48 132 58 130 84 C124 70 112 64 100 64 C88 64 76 70 70 84Z" fill="#2A2420"/>
+        <ellipse cx="100" cy="44" rx="9" ry="10" fill="#2A2420"/>
+        <!-- 머리띠(망건) -->
+        <path d="M71 74 C84 66 116 66 129 74" stroke="#4A3B2E" stroke-width="5" fill="none"/>
+        <!-- 눈썹/눈/입 -->
+        <path d="M84 84 L94 82 M106 82 L116 84" stroke="#2A2420" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="90" cy="92" r="2.6" fill="#2A2420"/><circle cx="110" cy="92" r="2.6" fill="#2A2420"/>
+        <path d="M100 96 L98 106 L102 106" stroke="#A8744E" stroke-width="2" fill="none"/>
+        <path d="M92 114 Q100 117 108 114" stroke="#8A4E3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- 손의 돌 -->
+        <circle cx="152" cy="168" r="13" fill="#8C8F93"/><path d="M144 164 L150 160 M156 172 L160 168" stroke="#6E7175" stroke-width="2"/>
+      </svg></span>
+      <span class="layer color" id="colorLayer"></span>
+      <svg class="ticks" viewBox="0 0 200 200" aria-hidden="true"><line x1="100" y1="100" x2="100.0" y2="-10.0"/><line x1="100" y1="100" x2="195.3" y2="45.0"/><line x1="100" y1="100" x2="195.3" y2="155.0"/><line x1="100" y1="100" x2="100.0" y2="210.0"/><line x1="100" y1="100" x2="4.7" y2="155.0"/><line x1="100" y1="100" x2="4.7" y2="45.0"/></svg>
+    </button>
+    <div class="plabel" id="plabel">잊혀진 얼굴</div>
+  </div>
+
+  <p class="note">지도는 위치 관계만 나타낸 개략도입니다. 가운데 초상은 20대 청년 석공을 상상한 임시 일러스트입니다. 날짜와 수치는 발표 전에 공훈전자사료관 등으로 다시 확인해 주세요.</p>
+
+  <div class="credits">
+    <h2>사진 출처</h2>
+    <ul>
+      <li>장소 사진과 대한매일신보 사진: 위키미디어 공용 사용자 고려, <a href="https://creativecommons.org/licenses/by/4.0/deed.ko" target="_blank" rel="noopener">CC BY 4.0</a> · 각 사진 설명의 링크에서 원본을 볼 수 있습니다.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <div class="card" id="card" role="dialog" aria-modal="true" aria-labelledby="ctitle"></div>
+</div>
+
+<script>
+const ICONS={
+ house:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>',
+ mortar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 10h16l-2 8a2 2 0 0 1-2 1.5H8A2 2 0 0 1 6 18z"/><path d="M14 10 19 3"/><path d="M8 13h8"/></svg>',
+ hill:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 18 9 8l4 5 3-3 6 8z"/><path d="M2 21h20M5 21v-2M9 21v-2M13 21v-2M17 21v-2"/></svg>',
+ station:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="6" y="3" width="12" height="13" rx="3"/><path d="M6 10h12"/><circle cx="9" cy="13" r=".8" fill="currentColor"/><circle cx="15" cy="13" r=".8" fill="currentColor"/><path d="m8 16-3 5M16 16l3 5"/></svg>',
+ stone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M7 20V7a5 5 0 0 1 10 0v13"/><path d="M4 20h16"/><path d="M10 9h4M10 12h4"/></svg>',
+ bust:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7z"/></svg>'
+};
+const PLACES=[
+ {n:1,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Site_of_Won_Tae-woo%27s_House.jpg/330px-Site_of_Won_Tae-woo%27s_House.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Site_of_Won_Tae-woo%27s_House.jpg/960px-Site_of_Won_Tae-woo%27s_House.jpg',src:'https://commons.wikimedia.org/wiki/File:Site_of_Won_Tae-woo%27s_House.jpg',cap:'원태우 집터, 지금의 농협 건물',icon:'house',x:26,y:75,name:'원태우 집터',era:'1882',
+  title:'안양리 농가에서 태어나다',
+  text:'원태우 지사는 1882년 3월 4일 과천현 하서면 안양리의 농가에서 태어났습니다. 지금의 안양1동, 만안로의 농협 건물 자리입니다. 2019년 이곳에 원태우 집터 표지석이 세워졌습니다.',
+  where:'만안구 안양1동 · 안양역 인근'},
+ {n:2,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Anyang_Museum.jpg/330px-Anyang_Museum.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Anyang_Museum.jpg/960px-Anyang_Museum.jpg',src:'https://commons.wikimedia.org/wiki/File:Anyang_Museum.jpg',cap:'안양박물관',icon:'mortar',x:46,y:13,name:'안양박물관',era:'석공 시절',
+  title:'돌을 다루던 손',
+  text:'원태우 지사는 농사를 지으며 석수동에서 석공 일을 했습니다. 돌절구와 맷돌을 특히 잘 만들었다고 전해집니다. 그가 만든 돌절구 하나는 독립기념관에, 다른 하나는 안양박물관에 남아 있습니다.',
+  where:'만안구 석수동 · 안양예술공원 입구'},
+ {n:3,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_%281%29.jpg/330px-Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_%281%29.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_%281%29.jpg/960px-Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_%281%29.jpg',src:'https://commons.wikimedia.org/wiki/File:Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_(1).jpg',cap:'석수동 원태우 지사 의거지 표지석, 뒤로 경부선 철길',icon:'hill',x:16,y:26,name:'서리재 의거지',era:'1905',
+  title:'기차가 지나던 고개',
+  text:'지금의 석수동 안양육교 일대는 옛날 서리재 고개였습니다. 고개 아래로 막 개통한 경부선 철길이 지나갔고, 비탈에서 내려다보면 지나가는 열차가 가까이 보였습니다. 1905년 11월, 이 고개에서 한 청년이 돌을 들었습니다. 무슨 일이 있었는지는 여섯 곳을 모두 둘러본 뒤 가운데 인물을 눌러 확인하세요.',
+  where:'만안구 석수동 · 관악역에서 서울 방향 철길을 따라 약 300~500m'},
+ {n:4,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg/330px-Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg/960px-Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',src:'https://commons.wikimedia.org/wiki/File:Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',cap:'안양역 1번 출구의 원태우 지사 부조와 비문',icon:'station',x:15,y:53,name:'안양역',era:'1905',
+  title:'같은 해에 문을 연 역',
+  text:'안양역은 1905년 경부선 개통과 함께 문을 열었습니다. 원태우 지사가 돌을 던진 바로 그 해입니다. 지금 안양역 1번 출구 벽에는 원태우 지사의 의거를 기리는 동판 부조와 비문이 새겨져 있습니다.',
+  where:'만안구 안양동 · 안양역 1번 출구'},
+ {n:5,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg/330px-Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg/960px-Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg',src:'https://commons.wikimedia.org/wiki/File:Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg',cap:'만안도서관의 원태우지사 의거비',icon:'stone',x:47,y:86,name:'만안도서관 의거비',era:'1992',
+  title:'87년 만의 같은 날',
+  text:'1992년 11월 22일, 안양의 시민단체 새안양회가 안양시립만안도서관 마당에 원태우지사 의거비를 세웠습니다. 날짜는 의거가 있었던 11월 22일에 맞췄습니다. 주먹만 한 돌을 쥐고 던지려는 모습의 조형물입니다.',
+  where:'만안구 안양동 · 안양시립만안도서관 옥외'},
+ {n:6,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Patriot_Won_Tae-woo%27s_Sculpture.jpg/330px-Patriot_Won_Tae-woo%27s_Sculpture.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Patriot_Won_Tae-woo%27s_Sculpture.jpg/960px-Patriot_Won_Tae-woo%27s_Sculpture.jpg',src:'https://commons.wikimedia.org/wiki/File:Patriot_Won_Tae-woo%27s_Sculpture.jpg',cap:'원태우 지사 흉상(오른쪽)',icon:'bust',x:84,y:66,name:'평촌 자유공원',era:'2008~2009',
+  title:'노인이 된 청년',
+  text:'평촌 자유공원을 조성하면서 다른 독립유공자 세 분과 함께 원태우 지사의 흉상이 세워졌습니다. 그런데 의거 당시 20대 초반의 농부이자 석공이었던 그가, 여러 기념물에서는 갓을 쓴 5~60대 선비로 표현되어 있습니다. 일본 화보에 실린 그림을 따른 결과라는 비판도 있습니다. 진짜 원태우 지사는 어떤 모습이었을까요?',
+  where:'동안구 평촌 · 자유공원'}
+];
+const TOTAL=PLACES.length;
+const map=document.getElementById('map'), scrim=document.getElementById('scrim'), card=document.getElementById('card');
+const portrait=document.getElementById('portrait'), face=document.getElementById('face'), plabel=document.getElementById('plabel');
+const pips=document.getElementById('pips'), count=document.getElementById('count');
+let seen=new Set(), lastFocus=null;
+{const c=face.cloneNode(true);c.removeAttribute('id');document.getElementById('colorLayer').appendChild(c);}
+
+PLACES.forEach(p=>{
+  const b=document.createElement('button');
+  b.type='button';b.className='marker';b.id='m'+p.n;
+  b.style.left=p.x+'%';b.style.top=p.y+'%';
+  b.setAttribute('aria-label',p.n+'번 '+p.name);
+  b.innerHTML='<span class="thumb">'+ICONS[p.icon]+'<img alt="" loading="lazy" src="'+p.thumb+'" onerror="this.remove()">'+'<span class="num">'+p.n+'</span></span><span class="mlabel">'+p.name+'</span>';
+  b.addEventListener('click',()=>openPlace(p,b));
+  map.appendChild(b);
+  const pip=document.createElement('span');pip.className='pip';pips.appendChild(pip);
+});
+
+function update(){
+  const k=seen.size;
+  portrait.style.setProperty('--fill',(k*360/TOTAL)+'deg');
+  [...pips.children].forEach((el,i)=>el.classList.toggle('on',i<k));
+  count.textContent=k+' / '+TOTAL;
+  PLACES.forEach(p=>document.getElementById('m'+p.n).classList.toggle('seen',seen.has(p.n)));
+  const done=k===TOTAL;
+  portrait.classList.toggle('gold',done);
+  portrait.setAttribute('aria-disabled',String(!done));
+  portrait.setAttribute('aria-label',done?'원태우 지사. 눌러서 1905년 그날의 이야기 보기':'원태우 지사 초상. 여섯 장소를 모두 둘러보면 한 칸씩 색이 찹니다');
+  plabel.classList.toggle('gold',done);
+  plabel.textContent=done?'눌러서 그날의 이야기 보기':(k===0?'잊혀진 얼굴':'색을 되찾는 중 '+k+' / '+TOTAL);
+}
+
+function show(html,cls){
+  lastFocus=document.activeElement;
+  card.className='card'+(cls?' '+cls:'');
+  card.innerHTML=html;
+  scrim.hidden=false;
+  card.scrollTop=0;
+  const x=card.querySelector('.x'); if(x) x.focus();
+}
+function close(){
+  scrim.hidden=true;
+  const cb=card.dataset.onclose; card.dataset.onclose='';
+  if(cb){seen.add(Number(cb));update();}
+  if(lastFocus) lastFocus.focus();
+}
+function openPlace(p){
+  show('<div class="top"><div><span class="chip">'+p.n+' · '+p.era+'</span><h2 id="ctitle">'+p.title+'</h2></div><button class="x" type="button" aria-label="닫기">×</button></div>'+
+       '<figure><img alt="'+p.cap+'" src="'+p.img+'" onerror="this.parentNode.remove()"><figcaption>'+p.cap+' · 사진: 고려, CC BY 4.0, <a href="'+p.src+'" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure><p>'+p.text+'</p><p class="where">'+p.where+'</p>'+
+       '<button class="btn" type="button" data-close>확인</button>');
+  card.dataset.onclose=p.n;
+}
+function openStory(){
+  show('<div class="top"><div><span class="date">1905년 11월 22일</span><h2 id="ctitle">서리재 고개의 돌 하나</h2></div><button class="x" type="button" aria-label="닫기">×</button></div>'+
+   '<div class="beat"><h3>그날 이전</h3><p>1905년 11월 17일, 대한제국의 외교권을 빼앗는 을사늑약이 강제로 체결됩니다. 이를 주도한 사람은 이토 히로부미였습니다. 닷새 뒤, 이토는 수원에서 사냥을 마치고 열차를 타고 서울로 돌아가고 있었습니다. 그 열차는 안양을 지나야 했습니다.</p></div>'+
+   '<div class="beat"><h3>무너진 첫 계획</h3><p>안양의 청년 원태우는 동료들과 함께 철로에 바위를 올려 열차를 멈추려 했습니다. 그러나 겁을 먹은 동료가 바위를 치워 버리면서 계획은 틀어졌습니다. 그는 포기하지 않았습니다. 돌을 쥐고 서리재 고개 비탈에 몸을 숨겼습니다.</p></div>'+
+   '<div class="beat"><h3>그 순간</h3><p>열차가 고개 아래를 지나는 순간, 원태우는 돌을 던졌습니다. 평생 돌을 다뤄 온 석공의 손에서 떠난 돌은 이토가 앉은 자리의 유리창을 깨뜨렸고, 이토는 깨진 유리 조각에 얼굴을 다친 것으로 전해집니다. 이 사건은 당시 한국과 일본 신문에 보도될 만큼 큰 일이었습니다.</p></div>'+
+   '<figure><img onerror="this.parentNode.remove()" alt="1905년 11월 24일 대한매일신보에 실린 원태우 지사 투석 사건 기사" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Won_Tae-woo%27s_Stone_throwing_event_%28The_Korea_Daily_News%29.jpg/960px-Won_Tae-woo%27s_Stone_throwing_event_%28The_Korea_Daily_News%29.jpg"><figcaption>1905년 11월 24일 대한매일신보에 실린 투석 사건 기사 · 사진: 고려, CC BY 4.0, <a href="https://commons.wikimedia.org/wiki/File:Won_Tae-woo%27s_Stone_throwing_event_(The_Korea_Daily_News).jpg" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure>'+
+   '<div class="beat"><h3>그 직후</h3><p>원태우 지사는 현장에서 일본 경찰에 붙잡혀 혹독한 고문을 받았습니다. 이듬해인 1906년 1월 24일에야 풀려났지만, 고문의 후유증을 평생 안고 살아야 했습니다.</p></div>'+
+   '<div class="beat"><h3>그리고</h3><p>4년 뒤인 1909년, 안중근이 하얼빈에서 이토 히로부미를 저격합니다. 원태우 지사의 이름은 오랫동안 잊혀 있다가, 1990년에야 건국훈장 애족장이 추서되었습니다. 이제 여러분은 안양의 이 청년을 기억하는 사람이 되었습니다.</p></div>'+
+   '<button class="btn" type="button" data-close>지도로 돌아가기</button>','story');
+}
+portrait.addEventListener('click',()=>{ if(seen.size===TOTAL) openStory(); });
+card.addEventListener('click',e=>{ if(e.target.closest('.x,[data-close]')) close(); });
+scrim.addEventListener('click',e=>{ if(e.target===scrim) close(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!scrim.hidden) close(); });
+document.getElementById('reset').addEventListener('click',()=>{seen=new Set();update();});
+update();
+</script>
+
+</body>
+</html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>원태우 의사님을 찾아서</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
