@@ -71,6 +71,16 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .chip{display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--accent);border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-variant-numeric:tabular-nums}
 .card h2{font-family:var(--display);font-weight:400;font-size:26px;line-height:1.25;margin:6px 0 0;text-wrap:balance}
 .photo{aspect-ratio:16/9;border:1.5px dashed var(--line);border-radius:6px;display:grid;place-items:center;color:var(--muted);font-size:13px;background:var(--bg)}
+figure{margin:0;display:grid;gap:6px}
+figure img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;background:var(--bg)}
+figcaption{font-size:11.5px;color:var(--muted);line-height:1.5}
+figcaption a{color:inherit}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;filter:grayscale(.85);transition:filter .5s}
+.marker.seen .thumb img{filter:none}
+.credits{font-size:12px;color:var(--muted);margin:0;display:grid;gap:4px}
+.credits h2{font-size:13px;font-weight:600;margin:0;color:var(--ink)}
+.credits ul{margin:0;padding-left:18px}
+.credits a{color:inherit}
 .card p{margin:0}
 .where{font-size:13px;color:var(--muted)}
 .x{background:none;border:0;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:4px}
@@ -151,7 +161,14 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
     <div class="plabel" id="plabel">잊혀진 얼굴</div>
   </div>
 
-  <p class="note">지도는 위치 관계만 나타낸 개략도입니다. 동그라미 안 그림과 팝업의 점선 상자는 장소 사진이 들어갈 자리이고, 가운데 초상은 20대 청년 석공을 상상한 임시 일러스트입니다. 날짜와 수치는 발표 전에 공훈전자사료관 등으로 다시 확인해 주세요.</p>
+  <p class="note">지도는 위치 관계만 나타낸 개략도입니다. 가운데 초상은 20대 청년 석공을 상상한 임시 일러스트입니다. 날짜와 수치는 발표 전에 공훈전자사료관 등으로 다시 확인해 주세요.</p>
+
+  <div class="credits">
+    <h2>사진 출처</h2>
+    <ul>
+      <li>장소 사진과 대한매일신보 사진: 위키미디어 공용 사용자 고려, <a href="https://creativecommons.org/licenses/by/4.0/deed.ko" target="_blank" rel="noopener">CC BY 4.0</a> · 각 사진 설명의 링크에서 원본을 볼 수 있습니다.</li>
+    </ul>
+  </div>
 </div>
 
 <div class="scrim" id="scrim" hidden>
@@ -168,27 +185,27 @@ const ICONS={
  bust:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7z"/></svg>'
 };
 const PLACES=[
- {n:1,icon:'house',x:26,y:75,name:'원태우 집터',era:'1882',
+ {n:1,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Site_of_Won_Tae-woo%27s_House.jpg/330px-Site_of_Won_Tae-woo%27s_House.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Site_of_Won_Tae-woo%27s_House.jpg/960px-Site_of_Won_Tae-woo%27s_House.jpg',src:'https://commons.wikimedia.org/wiki/File:Site_of_Won_Tae-woo%27s_House.jpg',cap:'원태우 집터, 지금의 농협 건물',icon:'house',x:26,y:75,name:'원태우 집터',era:'1882',
   title:'안양리 농가에서 태어나다',
-  text:'원태우는 1882년 3월 4일 과천현 하서면 안양리의 농가에서 태어났습니다. 지금의 안양1동, 농협 안양역 지점 자리입니다. 2019년 이곳에 원태우 집터 표지석이 세워졌습니다.',
+  text:'원태우는 1882년 3월 4일 과천현 하서면 안양리의 농가에서 태어났습니다. 지금의 안양1동, 만안로의 농협 건물 자리입니다. 2019년 이곳에 원태우 집터 표지석이 세워졌습니다.',
   where:'만안구 안양1동 · 안양역 인근'},
- {n:2,icon:'mortar',x:46,y:13,name:'안양박물관',era:'석공 시절',
+ {n:2,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Anyang_Museum.jpg/330px-Anyang_Museum.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Anyang_Museum.jpg/960px-Anyang_Museum.jpg',src:'https://commons.wikimedia.org/wiki/File:Anyang_Museum.jpg',cap:'안양박물관',icon:'mortar',x:46,y:13,name:'안양박물관',era:'석공 시절',
   title:'돌을 다루던 손',
   text:'원태우는 농사를 지으며 석수동에서 석공 일을 했습니다. 돌절구와 맷돌을 특히 잘 만들었다고 전해집니다. 그가 만든 돌절구 하나는 독립기념관에, 다른 하나는 안양박물관에 남아 있습니다.',
   where:'만안구 석수동 · 안양예술공원 입구'},
- {n:3,icon:'hill',x:16,y:26,name:'서리재 의거지',era:'1905',
+ {n:3,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_%281%29.jpg/330px-Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_%281%29.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_%281%29.jpg/960px-Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_%281%29.jpg',src:'https://commons.wikimedia.org/wiki/File:Site_of_the_Heroic_Deed_of_the_Patriot_Won_Tae-woo_(1).jpg',cap:'석수동 원태우 지사 의거지 표지석, 뒤로 경부선 철길',icon:'hill',x:16,y:26,name:'서리재 의거지',era:'1905',
   title:'기차가 지나던 고개',
   text:'지금의 석수동 안양육교 일대는 옛날 서리재 고개였습니다. 고개 아래로 막 개통한 경부선 철길이 지나갔고, 비탈에서 내려다보면 지나가는 열차가 가까이 보였습니다. 1905년 11월, 이 고개에서 한 청년이 돌을 들었습니다. 무슨 일이 있었는지는 여섯 곳을 모두 둘러본 뒤 가운데 인물을 눌러 확인하세요.',
   where:'만안구 석수동 · 관악역에서 서울 방향 철길을 따라 약 300~500m'},
- {n:4,icon:'station',x:15,y:53,name:'안양역',era:'1905',
+ {n:4,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg/330px-Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg/960px-Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',src:'https://commons.wikimedia.org/wiki/File:Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',cap:'안양역 1번 출구의 원태우 의사 부조와 비문',icon:'station',x:15,y:53,name:'안양역',era:'1905',
   title:'같은 해에 문을 연 역',
   text:'안양역은 1905년 경부선 개통과 함께 문을 열었습니다. 원태우가 돌을 던진 바로 그 해입니다. 지금 안양역 1번 출구 벽에는 원태우의 의거를 기리는 동판 부조와 비문이 새겨져 있습니다.',
   where:'만안구 안양동 · 안양역 1번 출구'},
- {n:5,icon:'stone',x:47,y:86,name:'만안도서관 의거비',era:'1992',
+ {n:5,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg/330px-Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg/960px-Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg',src:'https://commons.wikimedia.org/wiki/File:Memorial_Stone_of_Patriot_Won_Tae-woo%E2%80%99s_Patriotic_Deed.jpg',cap:'만안도서관의 원태우지사 의거비',icon:'stone',x:47,y:86,name:'만안도서관 의거비',era:'1992',
   title:'87년 만의 같은 날',
   text:'1992년 11월 22일, 안양의 시민단체 새안양회가 안양시립만안도서관 마당에 원태우지사 의거비를 세웠습니다. 날짜는 의거가 있었던 11월 22일에 맞췄습니다. 주먹만 한 돌을 쥐고 던지려는 모습의 조형물입니다.',
   where:'만안구 안양동 · 안양시립만안도서관 옥외'},
- {n:6,icon:'bust',x:84,y:66,name:'평촌 자유공원',era:'2008~2009',
+ {n:6,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Patriot_Won_Tae-woo%27s_Sculpture.jpg/330px-Patriot_Won_Tae-woo%27s_Sculpture.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Patriot_Won_Tae-woo%27s_Sculpture.jpg/960px-Patriot_Won_Tae-woo%27s_Sculpture.jpg',src:'https://commons.wikimedia.org/wiki/File:Patriot_Won_Tae-woo%27s_Sculpture.jpg',cap:'원태우 지사 흉상(오른쪽)',icon:'bust',x:84,y:66,name:'평촌 자유공원',era:'2008~2009',
   title:'노인이 된 청년',
   text:'평촌 자유공원을 조성하면서 다른 독립유공자 세 분과 함께 원태우의 흉상이 세워졌습니다. 그런데 의거 당시 20대 초반의 농부이자 석공이었던 그가, 여러 기념물에서는 갓을 쓴 5~60대 선비로 표현되어 있습니다. 일본 화보에 실린 그림을 따른 결과라는 비판도 있습니다. 진짜 원태우는 어떤 모습이었을까요?',
   where:'동안구 평촌 · 자유공원'}
@@ -204,7 +221,7 @@ PLACES.forEach(p=>{
   b.type='button';b.className='marker';b.id='m'+p.n;
   b.style.left=p.x+'%';b.style.top=p.y+'%';
   b.setAttribute('aria-label',p.n+'번 '+p.name);
-  b.innerHTML='<span class="thumb">'+ICONS[p.icon]+'<span class="num">'+p.n+'</span></span><span class="mlabel">'+p.name+'</span>';
+  b.innerHTML='<span class="thumb">'+ICONS[p.icon]+'<img alt="" loading="lazy" src="'+p.thumb+'" onerror="this.remove()">'+'<span class="num">'+p.n+'</span></span><span class="mlabel">'+p.name+'</span>';
   b.addEventListener('click',()=>openPlace(p,b));
   map.appendChild(b);
   const pip=document.createElement('span');pip.className='pip';pips.appendChild(pip);
@@ -240,7 +257,7 @@ function close(){
 }
 function openPlace(p){
   show('<div class="top"><div><span class="chip">'+p.n+' · '+p.era+'</span><h2 id="ctitle">'+p.title+'</h2></div><button class="x" type="button" aria-label="닫기">×</button></div>'+
-       '<div class="photo">'+p.name+' 사진 자리</div><p>'+p.text+'</p><p class="where">'+p.where+'</p>'+
+       '<figure><img alt="'+p.cap+'" src="'+p.img+'"><figcaption>'+p.cap+' · 사진: 고려, CC BY 4.0, <a href="'+p.src+'" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure><p>'+p.text+'</p><p class="where">'+p.where+'</p>'+
        '<button class="btn" type="button" data-close>확인</button>');
   card.dataset.onclose=p.n;
 }
@@ -249,6 +266,7 @@ function openStory(){
    '<div class="beat"><h3>그날 이전</h3><p>1905년 11월 17일, 대한제국의 외교권을 빼앗는 을사늑약이 강제로 체결됩니다. 이를 주도한 사람은 이토 히로부미였습니다. 닷새 뒤, 이토는 수원에서 사냥을 마치고 열차를 타고 서울로 돌아가고 있었습니다. 그 열차는 안양을 지나야 했습니다.</p></div>'+
    '<div class="beat"><h3>무너진 첫 계획</h3><p>안양의 청년 원태우는 동료들과 함께 철로에 바위를 올려 열차를 멈추려 했습니다. 그러나 겁을 먹은 동료가 바위를 치워 버리면서 계획은 틀어졌습니다. 원태우는 포기하지 않았습니다. 돌을 쥐고 서리재 고개 비탈에 몸을 숨겼습니다.</p></div>'+
    '<div class="beat"><h3>그 순간</h3><p>열차가 고개 아래를 지나는 순간, 원태우는 돌을 던졌습니다. 평생 돌을 다뤄 온 석공의 손에서 떠난 돌은 이토가 앉은 자리의 유리창을 깨뜨렸고, 이토는 깨진 유리 조각에 얼굴을 다친 것으로 전해집니다. 이 사건은 당시 한국과 일본 신문에 보도될 만큼 큰 일이었습니다.</p></div>'+
+   '<figure><img alt="1905년 11월 24일 대한매일신보에 실린 원태우 투석 사건 기사" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Won_Tae-woo%27s_Stone_throwing_event_%28The_Korea_Daily_News%29.jpg/960px-Won_Tae-woo%27s_Stone_throwing_event_%28The_Korea_Daily_News%29.jpg"><figcaption>1905년 11월 24일 대한매일신보에 실린 투석 사건 기사 · 사진: 고려, CC BY 4.0, <a href="https://commons.wikimedia.org/wiki/File:Won_Tae-woo%27s_Stone_throwing_event_(The_Korea_Daily_News).jpg" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure>'+
    '<div class="beat"><h3>그 직후</h3><p>원태우는 현장에서 일본 경찰에 붙잡혀 혹독한 고문을 받았습니다. 이듬해인 1906년 1월 24일에야 풀려났지만, 고문의 후유증을 평생 안고 살아야 했습니다.</p></div>'+
    '<div class="beat"><h3>그리고</h3><p>4년 뒤인 1909년, 안중근이 하얼빈에서 이토 히로부미를 저격합니다. 원태우의 이름은 오랫동안 잊혀 있다가, 1990년에야 건국훈장 애족장이 추서되었습니다. 이제 여러분은 안양의 이 청년을 기억하는 사람이 되었습니다.</p></div>'+
    '<button class="btn" type="button" data-close>지도로 돌아가기</button>','story');
