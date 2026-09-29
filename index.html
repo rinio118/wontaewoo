@@ -62,6 +62,14 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .portrait .layer svg{width:100%;height:100%;display:block}
 .portrait .gray svg{filter:grayscale(1) contrast(.8) brightness(1.05)}
 .portrait .color{-webkit-mask-image:linear-gradient(to top,#000 0 var(--fill),transparent var(--fill));mask-image:linear-gradient(to top,#000 0 var(--fill),transparent var(--fill))}
+.portrait .chains{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.chains .half{transform-box:fill-box;transition:transform .8s cubic-bezier(.3,.1,.6,1),opacity .8s ease}
+.chains .l{transform-origin:right center}
+.chains .r{transform-origin:left center}
+.chains .broken .l{transform:translate(-26px,34px) rotate(-28deg);opacity:0}
+.chains .broken .r{transform:translate(26px,34px) rotate(28deg);opacity:0}
+.chains .lock{transform-box:fill-box;transform-origin:center;transition:transform .8s cubic-bezier(.3,.1,.6,1),opacity .8s ease}
+.chains .lock.open{transform:translateY(40px) rotate(18deg);opacity:0}
 .portrait.gold{border-color:var(--gold);cursor:pointer;box-shadow:0 0 0 6px var(--gold-soft);animation:glow 2.4s ease-in-out infinite}
 @keyframes glow{50%{box-shadow:0 0 0 12px var(--gold-soft)}}
 .plabel{position:absolute;left:55%;top:calc(46% + clamp(62px,16%,124px));transform:translateX(-50%);font-size:12px;color:var(--muted);text-align:center;white-space:nowrap;background:var(--paper);padding:1px 8px;border-radius:4px}
@@ -108,7 +116,7 @@ figcaption a{color:inherit}
   <header>
     <span class="eyebrow">안양 인물 홍보 · 프로토타입</span>
     <h1>원태우 지사를 찾아서</h1>
-    <p class="lede">지도 위 여섯 곳을 하나씩 눌러 보세요. 장소를 둘러볼 때마다 가운데 인물이 색을 되찾고, 모두 둘러보면 1905년 그날의 이야기가 열립니다.</p>
+    <p class="lede">지도 위 여섯 곳을 하나씩 눌러 보세요. 장소를 둘러볼 때마다 가운데 인물을 묶은 사슬이 하나씩 끊어지며 색을 되찾고, 모두 둘러보면 1905년 그날의 이야기가 열립니다.</p>
   </header>
 
   <div class="status">
@@ -137,7 +145,7 @@ figcaption a{color:inherit}
       <text x="84" y="92" font-size="3" font-weight="600" opacity=".55">동안구</text>
     </svg>
 
-    <button class="portrait" id="portrait" type="button" aria-label="원태우 지사 초상. 여섯 장소를 모두 둘러보면 한 칸씩 색이 찹니다" aria-disabled="true">
+    <button class="portrait" id="portrait" type="button" aria-label="원태우 지사 초상. 장소를 하나 둘러볼 때마다 사슬이 하나씩 끊어지고 색이 한 칸씩 찹니다" aria-disabled="true">
       <span class="layer gray" id="grayLayer"><svg viewBox="0 0 200 200" id="face" aria-hidden="true">
         <rect width="200" height="200" fill="#D9B77A"/>
         <circle cx="100" cy="100" r="78" fill="#E8CF9C"/>
@@ -163,6 +171,7 @@ figcaption a{color:inherit}
         <circle cx="152" cy="168" r="13" fill="#8C8F93"/><path d="M144 164 L150 160 M156 172 L160 168" stroke="#6E7175" stroke-width="2"/>
       </svg></span>
       <span class="layer color" id="colorLayer"></span>
+      <svg class="chains" id="chains" viewBox="0 0 200 200" aria-hidden="true"></svg>
     </button>
     <div class="plabel" id="plabel">잊혀진 얼굴</div>
   </div>
@@ -222,6 +231,11 @@ const portrait=document.getElementById('portrait'), face=document.getElementById
 const pips=document.getElementById('pips'), count=document.getElementById('count');
 let seen=new Set(), lastFocus=null;
 {const c=face.cloneNode(true);c.removeAttribute('id');document.getElementById('colorLayer').appendChild(c);}
+const CHAIN_ANGLES=[[-38,24],[38,24],[0,-50],[-38,-24],[38,-24],[0,50]];
+const chainsEl=document.getElementById('chains');
+function links(from,to){let h='';for(let x=from,i=0;x<to;x+=11,i++){h+=i%2?'<rect x="'+(x-5.5)+'" y="-1.4" width="11" height="2.8" rx="1.4" fill="#5B6168"/><rect x="'+(x-4.5)+'" y="-.6" width="9" height=".8" rx=".4" fill="#B9BEC3"/>':'<ellipse cx="'+x+'" cy="0" rx="7" ry="4.2" fill="none" stroke="#4E545B" stroke-width="2.4"/><ellipse cx="'+x+'" cy="-.6" rx="5.4" ry="2.8" fill="none" stroke="#C3C8CD" stroke-width=".7"/>';}return h;}
+chainsEl.innerHTML=CHAIN_ANGLES.map((a,i)=>'<g class="chain" id="chain'+i+'" transform="translate(100 100) rotate('+a[0]+') translate(0 '+a[1]+')"><g class="half l">'+links(-150,-3)+'</g><g class="half r">'+links(8,150)+'</g></g>').join('')+
+ '<g class="lock" id="lock" transform="translate(100 150)"><path d="M-9 -4 V-11 a9 9 0 0 1 18 0 V-4" fill="none" stroke="#4E545B" stroke-width="3.2"/><rect x="-13" y="-5" width="26" height="21" rx="3" fill="#6B7178" stroke="#3F444A" stroke-width="1.4"/><circle cx="0" cy="4" r="2.6" fill="#2B2F34"/><rect x="-1" y="5" width="2" height="6" fill="#2B2F34"/></g>';
 
 PLACES.forEach(p=>{
   const b=document.createElement('button');
@@ -237,13 +251,15 @@ PLACES.forEach(p=>{
 function update(){
   const k=seen.size;
   portrait.style.setProperty('--fill',(k*100/TOTAL)+'%');
+  CHAIN_ANGLES.forEach((a,i)=>document.getElementById('chain'+i).classList.toggle('broken',i<k));
+  document.getElementById('lock').classList.toggle('open',k===TOTAL);
   [...pips.children].forEach((el,i)=>el.classList.toggle('on',i<k));
   count.textContent=k+' / '+TOTAL;
   PLACES.forEach(p=>document.getElementById('m'+p.n).classList.toggle('seen',seen.has(p.n)));
   const done=k===TOTAL;
   portrait.classList.toggle('gold',done);
   portrait.setAttribute('aria-disabled',String(!done));
-  portrait.setAttribute('aria-label',done?'원태우 지사. 눌러서 1905년 그날의 이야기 보기':'원태우 지사 초상. 여섯 장소를 모두 둘러보면 한 칸씩 색이 찹니다');
+  portrait.setAttribute('aria-label',done?'원태우 지사. 눌러서 1905년 그날의 이야기 보기':'원태우 지사 초상. 장소를 하나 둘러볼 때마다 사슬이 하나씩 끊어지고 색이 한 칸씩 찹니다');
   plabel.classList.toggle('gold',done);
   plabel.textContent=done?'눌러서 그날의 이야기 보기':(k===0?'잊혀진 얼굴':'색을 되찾는 중 '+k+' / '+TOTAL);
 }
