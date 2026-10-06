@@ -89,6 +89,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .photo{aspect-ratio:16/9;border:1.5px dashed var(--line);border-radius:6px;display:grid;place-items:center;color:var(--muted);font-size:13px;background:var(--bg)}
 figure{margin:0;display:grid;gap:6px}
 figure img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;background:var(--bg)}
+figure.wide img{aspect-ratio:auto}
 figcaption{font-size:11.5px;color:var(--muted);line-height:1.5}
 figcaption a{color:inherit}
 .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;filter:grayscale(.85);transition:filter .5s}
@@ -186,6 +187,7 @@ figcaption a{color:inherit}
     <h2>사진 출처</h2>
     <ul>
       <li>장소 사진과 대한매일신보 사진: 위키미디어 공용 사용자 고려, <a href="https://creativecommons.org/licenses/by/4.0/deed.ko" target="_blank" rel="noopener">CC BY 4.0</a> · 각 사진 설명의 링크에서 원본을 볼 수 있습니다.</li>
+      <li>1905년 무렵 안양역 열차 사진: 헤르만 산더(Hermann Sander) 촬영, 국립민속박물관 『독일인 헤르만 산더의 여행』 수록, 퍼블릭 도메인</li>
     </ul>
   </div>
 </div>
@@ -216,7 +218,7 @@ const PLACES=[
   title:'기차가 지나던 고개',
   text:'지금의 석수동 안양육교 일대는 옛날 서리재 고개였습니다. 고개 아래로 막 개통한 경부선 철길이 지나갔고, 비탈에서 내려다보면 지나가는 열차가 가까이 보였습니다. 1905년 11월, 이 고개에서 한 청년이 돌을 들었습니다. 무슨 일이 있었는지는 여섯 곳을 모두 둘러본 뒤 가운데 인물을 눌러 확인하세요.',
   where:'만안구 석수동 · 관악역에서 서울 방향 철길을 따라 약 300~500m'},
- {n:4,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg/330px-Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg/960px-Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',src:'https://commons.wikimedia.org/wiki/File:Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',cap:'안양역 1번 출구의 원태우 지사 부조와 비문',icon:'station',x:15,y:53,name:'안양역',era:'1905',
+ {n:4,thumb:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg/330px-Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg/960px-Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',src:'https://commons.wikimedia.org/wiki/File:Patriotic_martyr_Won_Tae-woo%27s_Relief_and_Signboard.jpg',cap:'안양역 1번 출구의 원태우 지사 부조와 비문',icon:'station',x:15,y:53,name:'안양역',era:'1905',extra:{img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/%EC%95%88%EC%96%91%EC%97%AD%EC%97%90_%EC%84%A0_%EB%82%B4%EA%B0%80_%ED%83%84_%EA%B8%B0%EC%B0%A8.jpg/960px-%EC%95%88%EC%96%91%EC%97%AD%EC%97%90_%EC%84%A0_%EB%82%B4%EA%B0%80_%ED%83%84_%EA%B8%B0%EC%B0%A8.jpg',src:'https://commons.wikimedia.org/wiki/File:%EC%95%88%EC%96%91%EC%97%AD%EC%97%90_%EC%84%A0_%EB%82%B4%EA%B0%80_%ED%83%84_%EA%B8%B0%EC%B0%A8.jpg',cap:'1905년 무렵 안양역에 선 경부선 열차'},
   title:'같은 해에 문을 연 역',
   text:'안양역은 1905년 경부선 개통과 함께 문을 열었습니다. 원태우 지사가 돌을 던진 바로 그 해입니다. 지금 안양역 1번 출구 벽에는 원태우 지사의 의거를 기리는 동판 부조와 비문이 새겨져 있습니다.',
   where:'만안구 안양동 · 안양역 1번 출구'},
@@ -299,13 +301,14 @@ function close(){
 }
 function openPlace(p){
   show('<div class="top"><div><span class="chip">'+p.n+' · '+p.era+'</span><h2 id="ctitle">'+p.title+'</h2></div><button class="x" type="button" aria-label="닫기">×</button></div>'+
-       '<figure><img alt="'+p.cap+'" src="'+p.img+'" onerror="this.parentNode.remove()"><figcaption>'+p.cap+' · 사진: 고려, CC BY 4.0, <a href="'+p.src+'" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure><p>'+p.text+'</p><p class="where">'+p.where+'</p>'+
+       '<figure><img alt="'+p.cap+'" src="'+p.img+'" onerror="this.parentNode.remove()"><figcaption>'+p.cap+' · 사진: 고려, CC BY 4.0, <a href="'+p.src+'" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure><p>'+p.text+'</p><p class="where">'+p.where+'</p>'+(p.extra?'<figure class="wide"><img alt="'+p.extra.cap+'" src="'+p.extra.img+'" onerror="this.parentNode.remove()"><figcaption>'+p.extra.cap+' · 사진: 헤르만 산더, 퍼블릭 도메인, <a href="'+p.extra.src+'" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure>':'')+
        '<button class="btn" type="button" data-close>확인</button>');
   card.dataset.onclose=p.n;
 }
 function openStory(){
   show('<div class="top"><div><span class="date">1905년 11월 22일</span><h2 id="ctitle">서리재 고개의 돌 하나</h2></div><button class="x" type="button" aria-label="닫기">×</button></div>'+
    '<div class="beat"><h3>그날 이전</h3><p>1905년 11월 17일, 대한제국의 외교권을 빼앗는 을사늑약이 강제로 체결됩니다. 이를 주도한 사람은 이토 히로부미였습니다. 닷새 뒤, 이토는 수원에서 사냥을 마치고 열차를 타고 서울로 돌아가고 있었습니다. 그 열차는 안양을 지나야 했습니다.</p></div>'+
+   '<figure class="wide"><img onerror="this.parentNode.remove()" alt="1905년 무렵 안양역에 선 경부선 열차" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/%EC%95%88%EC%96%91%EC%97%AD%EC%97%90_%EC%84%A0_%EB%82%B4%EA%B0%80_%ED%83%84_%EA%B8%B0%EC%B0%A8.jpg/960px-%EC%95%88%EC%96%91%EC%97%AD%EC%97%90_%EC%84%A0_%EB%82%B4%EA%B0%80_%ED%83%84_%EA%B8%B0%EC%B0%A8.jpg"><figcaption>1905년 무렵 안양역에 선 경부선 열차. 원태우가 돌을 던진 해, 바로 이 노선을 달리던 기차입니다 · 사진: 헤르만 산더, 퍼블릭 도메인, <a href="https://commons.wikimedia.org/wiki/File:%EC%95%88%EC%96%91%EC%97%AD%EC%97%90_%EC%84%A0_%EB%82%B4%EA%B0%80_%ED%83%84_%EA%B8%B0%EC%B0%A8.jpg" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure>'+
    '<div class="beat"><h3>무너진 첫 계획</h3><p>안양의 청년 원태우는 동료들과 함께 철로에 바위를 올려 열차를 멈추려 했습니다. 그러나 겁을 먹은 동료가 바위를 치워 버리면서 계획은 틀어졌습니다. 그는 포기하지 않았습니다. 돌을 쥐고 서리재 고개 비탈에 몸을 숨겼습니다.</p></div>'+
    '<div class="beat"><h3>그 순간</h3><p>열차가 고개 아래를 지나는 순간, 원태우는 돌을 던졌습니다. 평생 돌을 다뤄 온 석공의 손에서 떠난 돌은 이토가 앉은 자리의 유리창을 깨뜨렸고, 이토는 깨진 유리 조각에 얼굴을 다친 것으로 전해집니다. 이 사건은 당시 한국과 일본 신문에 보도될 만큼 큰 일이었습니다.</p></div>'+
    '<figure><img onerror="this.parentNode.remove()" alt="1905년 11월 24일 대한매일신보에 실린 원태우 지사 투석 사건 기사" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Won_Tae-woo%27s_Stone_throwing_event_%28The_Korea_Daily_News%29.jpg/960px-Won_Tae-woo%27s_Stone_throwing_event_%28The_Korea_Daily_News%29.jpg"><figcaption>1905년 11월 24일 대한매일신보에 실린 투석 사건 기사 · 사진: 고려, CC BY 4.0, <a href="https://commons.wikimedia.org/wiki/File:Won_Tae-woo%27s_Stone_throwing_event_(The_Korea_Daily_News).jpg" target="_blank" rel="noopener">위키미디어 공용</a></figcaption></figure>'+
