@@ -41,11 +41,11 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,6vw,46px);lin
 button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
 /* 지도 */
-.map{position:relative;width:100%;aspect-ratio:1/1.02;max-height:86vh;margin-inline:auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.map{container-type:inline-size;position:relative;width:100%;aspect-ratio:1/1.02;max-height:86vh;margin-inline:auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .map svg.base{position:absolute;inset:0;width:100%;height:100%}
 .base text{font-family:var(--body);fill:var(--muted)}
-.marker{position:absolute;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:4px;background:none;border:0;padding:0;cursor:pointer;color:var(--ink);width:clamp(62px,15%,110px)}
-.thumb{position:relative;width:100%;aspect-ratio:1;border-radius:50%;background:var(--bg);border:2px solid var(--rail);display:grid;place-items:center;transition:transform .2s,border-color .3s,background .3s}
+.marker{position:absolute;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:4px;background:none;border:0;padding:0;cursor:pointer;color:var(--ink);width:max-content}
+.thumb{position:relative;width:clamp(50px,15cqw,110px);aspect-ratio:1;border-radius:50%;background:var(--bg);border:2px solid var(--rail);display:grid;place-items:center;transition:transform .2s,border-color .3s,background .3s}
 .thumb svg{width:52%;height:52%;color:var(--muted)}
 .marker:hover .thumb{transform:scale(1.06)}
 .num{position:absolute;top:-4px;left:-4px;width:24px;height:24px;border-radius:50%;background:var(--paper);border:1.5px solid var(--rail);font-size:12px;font-weight:600;display:grid;place-items:center;font-variant-numeric:tabular-nums}
@@ -63,11 +63,14 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .portrait .gray svg{filter:grayscale(1) contrast(.8) brightness(1.05)}
 .portrait .color{-webkit-mask-image:linear-gradient(to top,#000 0 var(--fill),transparent var(--fill));mask-image:linear-gradient(to top,#000 0 var(--fill),transparent var(--fill))}
 .portrait .chains{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.chains .half{transform-box:fill-box;transition:transform .8s cubic-bezier(.3,.1,.6,1),opacity .8s ease}
-.chains .l{transform-origin:right center}
-.chains .r{transform-origin:left center}
-.chains .broken .l{transform:translate(-26px,34px) rotate(-28deg);opacity:0}
-.chains .broken .r{transform:translate(26px,34px) rotate(28deg);opacity:0}
+.mapchains{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.mchain .half{transform-box:fill-box;transition:transform .9s cubic-bezier(.3,.1,.6,1),opacity .9s ease}
+.mchain .a{transform-origin:left center}
+.mchain .b{transform-origin:right center}
+.mchain.broken .a{transform:translate(-10px,16px) rotate(-14deg);opacity:0}
+.mchain.broken .b{transform:translate(10px,16px) rotate(14deg);opacity:0}
+.mchain .ring{transition:opacity .6s ease}
+.mchain.broken .ring{opacity:0}
 .chains .lock{transform-box:fill-box;transform-origin:center;transition:transform .8s cubic-bezier(.3,.1,.6,1),opacity .8s ease}
 .chains .lock.open{transform:translateY(40px) rotate(18deg);opacity:0}
 .portrait.gold{border-color:var(--gold);cursor:pointer;box-shadow:0 0 0 6px var(--gold-soft);animation:glow 2.4s ease-in-out infinite}
@@ -116,7 +119,7 @@ figcaption a{color:inherit}
   <header>
     <span class="eyebrow">안양 인물 홍보 · 프로토타입</span>
     <h1>원태우 지사를 찾아서</h1>
-    <p class="lede">지도 위 여섯 곳을 하나씩 눌러 보세요. 장소를 둘러볼 때마다 가운데 인물을 묶은 사슬이 하나씩 끊어지며 색을 되찾고, 모두 둘러보면 1905년 그날의 이야기가 열립니다.</p>
+    <p class="lede">지도 위 여섯 곳을 하나씩 눌러 보세요. 장소를 둘러볼 때마다 그 장소와 가운데 인물을 잇는 사슬이 끊어지며 색을 되찾고, 모두 둘러보면 1905년 그날의 이야기가 열립니다.</p>
   </header>
 
   <div class="status">
@@ -144,8 +147,9 @@ figcaption a{color:inherit}
       <text x="2" y="66" font-size="3" font-weight="600" opacity=".55">만안구</text>
       <text x="84" y="92" font-size="3" font-weight="600" opacity=".55">동안구</text>
     </svg>
+    <svg class="mapchains" id="mapchains" aria-hidden="true"></svg>
 
-    <button class="portrait" id="portrait" type="button" aria-label="원태우 지사 초상. 장소를 하나 둘러볼 때마다 사슬이 하나씩 끊어지고 색이 한 칸씩 찹니다" aria-disabled="true">
+    <button class="portrait" id="portrait" type="button" aria-label="원태우 지사 초상. 장소를 둘러볼 때마다 그 장소와 이어진 사슬이 끊어지고 색이 한 칸씩 찹니다" aria-disabled="true">
       <span class="layer gray" id="grayLayer"><svg viewBox="0 0 200 200" id="face" aria-hidden="true">
         <rect width="200" height="200" fill="#D9B77A"/>
         <circle cx="100" cy="100" r="78" fill="#E8CF9C"/>
@@ -231,11 +235,26 @@ const portrait=document.getElementById('portrait'), face=document.getElementById
 const pips=document.getElementById('pips'), count=document.getElementById('count');
 let seen=new Set(), lastFocus=null;
 {const c=face.cloneNode(true);c.removeAttribute('id');document.getElementById('colorLayer').appendChild(c);}
-const CHAIN_ANGLES=[[-38,24],[38,24],[0,-50],[-38,-24],[38,-24],[0,50]];
 const chainsEl=document.getElementById('chains');
-function links(from,to){let h='';for(let x=from,i=0;x<to;x+=11,i++){h+=i%2?'<rect x="'+(x-5.5)+'" y="-1.4" width="11" height="2.8" rx="1.4" fill="#5B6168"/><rect x="'+(x-4.5)+'" y="-.6" width="9" height=".8" rx=".4" fill="#B9BEC3"/>':'<ellipse cx="'+x+'" cy="0" rx="7" ry="4.2" fill="none" stroke="#4E545B" stroke-width="2.4"/><ellipse cx="'+x+'" cy="-.6" rx="5.4" ry="2.8" fill="none" stroke="#C3C8CD" stroke-width=".7"/>';}return h;}
-chainsEl.innerHTML=CHAIN_ANGLES.map((a,i)=>'<g class="chain" id="chain'+i+'" transform="translate(100 100) rotate('+a[0]+') translate(0 '+a[1]+')"><g class="half l">'+links(-150,-3)+'</g><g class="half r">'+links(8,150)+'</g></g>').join('')+
- '<g class="lock" id="lock" transform="translate(100 150)"><path d="M-9 -4 V-11 a9 9 0 0 1 18 0 V-4" fill="none" stroke="#4E545B" stroke-width="3.2"/><rect x="-13" y="-5" width="26" height="21" rx="3" fill="#6B7178" stroke="#3F444A" stroke-width="1.4"/><circle cx="0" cy="4" r="2.6" fill="#2B2F34"/><rect x="-1" y="5" width="2" height="6" fill="#2B2F34"/></g>';
+chainsEl.innerHTML='<g class="lock" id="lock" transform="translate(100 150)"><path d="M-9 -4 V-11 a9 9 0 0 1 18 0 V-4" fill="none" stroke="#4E545B" stroke-width="3.2"/><rect x="-13" y="-5" width="26" height="21" rx="3" fill="#6B7178" stroke="#3F444A" stroke-width="1.4"/><circle cx="0" cy="4" r="2.6" fill="#2B2F34"/><rect x="-1" y="5" width="2" height="6" fill="#2B2F34"/></g>';
+const mapChains=document.getElementById('mapchains');
+function chainLinks(from,to,L){let h='';const rx=L*.62,ry=L*.36,sw=Math.max(1.6,L*.2),bh=L*.26;for(let x=from,i=0;x<to;x+=L,i++){h+=i%2?'<rect x="'+(x-L/2).toFixed(1)+'" y="'+(-bh/2).toFixed(1)+'" width="'+L.toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="'+(bh/2).toFixed(1)+'" fill="#5B6168"/><rect x="'+(x-L*.4).toFixed(1)+'" y="'+(-bh*.2).toFixed(1)+'" width="'+(L*.8).toFixed(1)+'" height="'+(bh*.3).toFixed(1)+'" fill="#B9BEC3"/>':'<ellipse cx="'+x.toFixed(1)+'" cy="0" rx="'+rx.toFixed(1)+'" ry="'+ry.toFixed(1)+'" fill="none" stroke="#4E545B" stroke-width="'+sw.toFixed(1)+'"/><ellipse cx="'+x.toFixed(1)+'" cy="'+(-ry*.15).toFixed(1)+'" rx="'+(rx*.78).toFixed(1)+'" ry="'+(ry*.66).toFixed(1)+'" fill="none" stroke="#C3C8CD" stroke-width="'+(sw*.3).toFixed(1)+'"/>';}return h;}
+function drawChains(){
+  const mr=map.getBoundingClientRect(); if(!mr.width) return;
+  mapChains.setAttribute('viewBox','0 0 '+mr.width+' '+mr.height);
+  const pr=portrait.getBoundingClientRect();
+  const pcx=pr.left-mr.left+pr.width/2, pcy=pr.top-mr.top+pr.height/2, prad=pr.width/2;
+  mapChains.innerHTML=PLACES.map(p=>{
+    const t=document.querySelector('#m'+p.n+' .thumb').getBoundingClientRect();
+    const mcx=t.left-mr.left+t.width/2, mcy=t.top-mr.top+t.height/2, mrad=t.width/2;
+    const dx=pcx-mcx, dy=pcy-mcy, d=Math.hypot(dx,dy), ang=Math.atan2(dy,dx)*180/Math.PI;
+    const L=Math.max(8,Math.min(13,mrad*.28));
+    const st=mrad-L*.3, en=d-prad+L*.6, mid=(st+en)/2;
+    const ring=(x)=>'<circle class="ring" cx="'+x.toFixed(1)+'" cy="0" r="'+(L*.45).toFixed(1)+'" fill="none" stroke="#3F444A" stroke-width="'+(L*.28).toFixed(1)+'"/>';
+    return '<g class="mchain'+(seen.has(p.n)?' broken':'')+'" id="mchain'+p.n+'" transform="translate('+mcx.toFixed(1)+' '+mcy.toFixed(1)+') rotate('+ang.toFixed(2)+')">'+
+      '<g class="half a">'+chainLinks(st,mid-L*.2,L)+'</g><g class="half b">'+chainLinks(mid+L*.6,en,L)+'</g>'+ring(st)+'</g>';
+  }).join('');
+}
 
 PLACES.forEach(p=>{
   const b=document.createElement('button');
@@ -251,7 +270,7 @@ PLACES.forEach(p=>{
 function update(){
   const k=seen.size;
   portrait.style.setProperty('--fill',(k*100/TOTAL)+'%');
-  CHAIN_ANGLES.forEach((a,i)=>document.getElementById('chain'+i).classList.toggle('broken',i<k));
+  PLACES.forEach(p=>{const c=document.getElementById('mchain'+p.n); if(c) c.classList.toggle('broken',seen.has(p.n));});
   document.getElementById('lock').classList.toggle('open',k===TOTAL);
   [...pips.children].forEach((el,i)=>el.classList.toggle('on',i<k));
   count.textContent=k+' / '+TOTAL;
@@ -259,7 +278,7 @@ function update(){
   const done=k===TOTAL;
   portrait.classList.toggle('gold',done);
   portrait.setAttribute('aria-disabled',String(!done));
-  portrait.setAttribute('aria-label',done?'원태우 지사. 눌러서 1905년 그날의 이야기 보기':'원태우 지사 초상. 장소를 하나 둘러볼 때마다 사슬이 하나씩 끊어지고 색이 한 칸씩 찹니다');
+  portrait.setAttribute('aria-label',done?'원태우 지사. 눌러서 1905년 그날의 이야기 보기':'원태우 지사 초상. 장소를 둘러볼 때마다 그 장소와 이어진 사슬이 끊어지고 색이 한 칸씩 찹니다');
   plabel.classList.toggle('gold',done);
   plabel.textContent=done?'눌러서 그날의 이야기 보기':(k===0?'잊혀진 얼굴':'색을 되찾는 중 '+k+' / '+TOTAL);
 }
@@ -299,7 +318,10 @@ card.addEventListener('click',e=>{ if(e.target.closest('.x,[data-close]')) close
 scrim.addEventListener('click',e=>{ if(e.target===scrim) close(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!scrim.hidden) close(); });
 document.getElementById('reset').addEventListener('click',()=>{seen=new Set();update();});
+drawChains();
 update();
+if(window.ResizeObserver) new ResizeObserver(()=>drawChains()).observe(map); else addEventListener('resize',drawChains);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(drawChains);
 </script>
 
 </body>
